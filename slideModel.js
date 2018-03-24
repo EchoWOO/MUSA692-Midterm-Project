@@ -1,91 +1,78 @@
 /* ================================
 Week 6 Assignment: slide Model
 ================================ */
-var slide1 = function() {
-  $(document).ready(function() {
-     $.ajax(dataset).done(function(data) {
-       var parsedData = JSON.parse(data);
-  layerone=L.geoJson(parsedData, {
-                   style: myStyle_all,
-                 }).addTo(map);
-  layerone.eachLayer(eachFeatureFunction);
-  });
-  });
-};
-
-var slide2 = function(feature) {
-   $(document).ready(function() {
-      $.ajax(dataset).done(function(data) {
-        var parsedData = JSON.parse(data);
-   layertwo=L.geoJson(parsedData, {
-                    style: myStyle,
-                  }).addTo(map);
-   layertwo.eachLayer(eachFeatureFunction);
- });
-});
-};
-
-var slide3 = function(feature) {
-  var myFilter = function(feature) {
-  if(feature.properties.pct_ebll_cat_label == 'Significantly higher (3+ times)'){
-    return true;
-  }
-    };
-   $(document).ready(function() {
-      $.ajax(dataset).done(function(data) {
-        var parsedData = JSON.parse(data);
-   layerthree=L.geoJson(parsedData, {
-                    style: myStyle,
-                    filter: myFilter
-                  }).addTo(map);
-   layerthree.eachLayer(eachFeatureFunction);
- });
-});
-};
-
-var slide4 = function(feature) {
-  var myFilter = function(feature) {
-  if(feature.properties.pct_ebll_cat_label == 'Significantly higher (1-2 times)'){
-    return true;
-  }
-    };
-   $(document).ready(function() {
-      $.ajax(dataset).done(function(data) {
-        var parsedData = JSON.parse(data);
-   layerfour=L.geoJson(parsedData, {
-                    style: myStyle,
-                    filter: myFilter
-                  }).addTo(map);
-   layerfour.eachLayer(eachFeatureFunction);
- });
-});
-};
-
-var slide5 = function(feature) {
-  var myFilter = function(feature) {
-  if(feature.properties.pct_ebll_cat_label == 'Significantly lower (<1.1%)'){
-    return true;
-  }
-    };
-   $(document).ready(function() {
-      $.ajax(dataset).done(function(data) {
-        var parsedData = JSON.parse(data);
-   layerfive=L.geoJson(parsedData, {
-                    style: myStyle,
-                    filter: myFilter
-                  }).addTo(map);
-   layerfive.eachLayer(eachFeatureFunction);
- });
-});
-};
-
-
 var featureGroup = L.featureGroup();
 
 var resetMap = function() {
-   map.removeLayer(featureGroup);
    featureGroup = L.featureGroup();
+   map.removeLayer(featureGroup);
 };
+
+var parsed;
+var layer1;
+var layer2;
+var layer3;
+var layer4;
+var parsedAjax = $.ajax(dataset).then(JSON.parse);
+parsedAjax.then(function(parsed) {
+  layer1 = L.geoJson(parsed, {
+    style: myStyle_all
+  });
+});
+parsedAjax.then(function(parsed) {
+  layer2 = L.geoJson(parsed, {
+    style: myStyle
+  });
+});
+parsedAjax.then(function(parsed) {
+  layer3 = L.geoJson(parsed, {
+    style: myStyle,
+    filter: function(feature) {
+      return feature.properties.pct_ebll_cat_label == 'Significantly higher (3+ times)';
+    }
+  });
+});
+parsedAjax.then(function(parsed) {
+  layer4 = L.geoJson(parsed, {
+    style: myStyle,
+    filter: function(feature) {
+      return feature.properties.pct_ebll_cat_label == 'Significantly higher (1-2 times)';
+    }
+  });
+});
+parsedAjax.then(function(parsed) {
+  layer5 = L.geoJson(parsed, {
+    style: myStyle,
+    filter: function(feature) {
+      return feature.properties.pct_ebll_cat_label == 'Significantly lower (<1.1%)';
+    }
+  });
+});
+var slide1 = function() {
+  layer1.addTo(map);
+  layer1.eachLayer(eachFeatureFunction);
+};
+
+var slide2 = function() {
+   layer2.addTo(map);
+   layer2.eachLayer(eachFeatureFunction);
+};
+
+var slide3 = function() {
+   layer3.addTo(map);
+   layer3.eachLayer(eachFeatureFunction);
+};
+
+var slide4 = function() {
+   layer4.addTo(map);
+   layer4.eachLayer(eachFeatureFunction);
+};
+
+var slide5 = function() {
+   layer5.addTo(map);
+   layer5.eachLayer(eachFeatureFunction);
+};
+
 /*
 var remove=function(data){
   _.each(data, function(layer){
@@ -98,6 +85,18 @@ var remove=function(data){
       map.removeLayer(layer);
   });
 };*/
+
+var PageNum=0;
+
+$('#slide1').show();
+$('#results').hide();
+$('#slide2').hide();
+$('#slide3').hide();
+$('#slide4').hide();
+$('#slide5').hide();
+$('.legend').hide();
+$('#buttonPre').hide();
+$('#buttonNext').show();
 
 var slideNum = function(Number) {
   if (Number==1){
@@ -156,54 +155,53 @@ var slideNum = function(Number) {
     $('#buttonNext').hide();
   }
 };
-var PageNum=1;
 
 $(document).ready(function(){
-  slideNum(PageNum);
-$('#buttonNext').click(function() {
-  resetMap();
-  PageNum++;
-  slideNum(PageNum);
-  console.log(PageNum);
-  if(PageNum==2){
-  resetMap();
-  slide2();
-  }
-  else if(PageNum==3){
-  resetMap();
-  slide3();
-  }
-  else if(PageNum==4){
-  resetMap();
-  slide4();
-  }
-  else if(PageNum==5){
-  resetMap();
-  slide5();
+  $('#buttonNext').click(function() {
+    PageNum++;
+    slideNum(PageNum);
+    if(PageNum==1){
+      slide1();
     }
-  return PageNum;
-});
+    if(PageNum==2){
+      map.removeLayer(layer1);
+      slide2();
+    }
+    else if(PageNum==3){
+      map.removeLayer(layer2);
+      slide3();
+    }
+    else if(PageNum==4){
+      map.removeLayer(layer3);
+      slide4();
+    }
+    else if(PageNum==5){
+      map.removeLayer(layer4);
+      slide5();
+    }
+  });
 
-$('#buttonPre').click(function() {
-  resetMap();
-  PageNum--;
-  slideNum(PageNum);
-  console.log(PageNum);
-  if(PageNum==4){
-  resetMap();
-  slide4();
-  }
-  else if(PageNum==3){
-  resetMap();
-  slide3();
-  }
-  else if(PageNum==2){
-  resetMap();
-  slide2();
-  }
-  else if(PageNum==1){
-  resetMap();
-  }
-  return PageNum;
-});
+  $('#buttonPre').click(function() {
+    resetMap();
+    PageNum--;
+    slideNum(PageNum);
+    console.log(PageNum);
+    if(PageNum==4){
+      map.removeLayer(layer5);
+      slide4();
+    }
+    else if(PageNum==3){
+      map.removeLayer(layer4);
+      slide3();
+    }
+    else if(PageNum==2){
+      map.removeLayer(layer3);
+      slide2();
+    }
+    else if(PageNum==1){
+      map.removeLayer(layer2);
+      slide1();
+    }
+    return PageNum;
+  });
 });

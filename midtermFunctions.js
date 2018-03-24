@@ -42,41 +42,27 @@ var showResults = function() {
 var eachFeatureFunction = function(layer) {
   layer.on('click', function (event) {
     if(PageNum==1){
-      var oldlevel = (layer.feature.properties.pct_ebll_cat_label);
-      var level = function(oldlevel){
-        if (oldlevel == "No significant difference"){ return "No significant difference";}
-        else if (oldlevel == "Significantly higher (1-2 times)"){ return "Significantly higher (1-2 times)";}
-        else if (oldlevel == "Significantly higher (3+ times)"){ return "Significantly higher (3+ times)";}
-        else if (oldlevel == "Significantly lower (<1.1%)"){ return "Significantly lower (<1.1%)";}
-      };
-      var newlevel = level(oldlevel);
-      console.log(newlevel);
-      $(".tract").text(newlevel);
-        }
+      var level = (layer.feature.properties.pct_ebll_cat_label);
+      console.log(level);
+      $(".tract").text(level);
+    }
         map.fitBounds(event.target.getBounds());
-        showResults();}
-      );
-    };
-
-var myFilter;
-var layerone;
-var layertwo;
-var layerthree;
-var layerfour;
-var layerfive;
-
+        showResults();
+  });
+};
 
 var dataset = "https://raw.githubusercontent.com/EchoWOO/MUSA692-Midterm-Project/master/childhoodLeadTract.json";
 
+/*
 $(document).ready(function() {
   $.ajax(dataset).done(function(data) {
     var parsedData = JSON.parse(data);
     console.log(parsedData);
     featureGroup = L.geoJson(parsedData, {
-      style: myStyle_all,
-      filter: myFilter
+      style: myStyle_all
     }).addTo(map);
     // quite similar to _.each
     featureGroup.eachLayer(eachFeatureFunction);
   });
 });
+*/
